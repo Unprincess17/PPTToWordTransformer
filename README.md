@@ -1,2 +1,2 @@
 # PdfToWordTransformer
-Transform pdf to word.
+Transform ppt to word.
