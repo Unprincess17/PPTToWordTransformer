@@ -1,0 +1,67 @@
+import os
+import os.path as op
+
+import win32com
+from win32com import client
+from PIL import Image
+
+def ppttoPng(ppt_path,long_sign:str):
+# ppt_path: ppt绝对路径
+# long_sign:长图确认
+
+    output_path = ppt_path # 判断文件是否存在
+
+    try:
+        ppt_app = win32com.client.gencache.EnsureDispatch('PowerPoint.Application')
+
+        ppt = ppt_app.Presentations.Open(ppt_path)  #打开ppt
+
+        ppt.SaveAs(output_path,17)
+        ppt_app.Quit()
+
+        if 'Y' == long_sign.upper():
+            generate_long_image(output_path)
+
+
+    except:
+        pass #此处可嵌套try-except，实现ppt，word，excel的打开
+
+
+
+# 生成长图
+def generate_long_image(output_path):
+    picture_path = output_path[:output_path.rfind('.')]
+    last_dir = op.dirname(picture_path) #返回上一级目录
+
+    #获取单张照片
+    ims = []
+    for fn in os.listdir(picture_path):
+        if fn.endswith('.JPG'):
+            ims.append(Image.open(op.join(picture_path,fn)))
+    print(len(ims))
+    width,height = ims[0].size
+    long_canvas = Image.new(ims[0].mode,(width,height * len(ims)))
+
+    #拼接照片
+    for i,image in enumerate(ims):
+        long_canvas.paste(image, box = (0, i * height))
+    long_canvas.save(op.join(last_dir,'long-image.png'))
+
+def ifexist(ppt_path):
+    exist = False
+    if op.exists(ppt_path):
+        exist = False
+    else:
+        exist = True
+    return exist
+
+def main():
+    ppt_path = input('请输入ppt的绝对路径及文件名（包括格式）')
+    if(ifexist(ppt_path)):
+       main()
+    long_sign = input("请输入是否需要保存长图，Y\\N:")
+    ppttoPng(ppt_path, long_sign)
+    print('Successfully')
+
+main()
+
