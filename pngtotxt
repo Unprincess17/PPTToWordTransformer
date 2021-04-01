@@ -1,0 +1,19 @@
+import pytesseract
+from PIL import Image
+
+def trans(pngfile):
+    pytesseract.pytesseract.tesseract_cmd = r'D:\tesseract-ocr\tesseract.exe'
+    image = Image.open(pngfile.replace('Test.pptx','long-image.png'))
+    text = pytesseract.image_to_string(image,lang='chi_sim')
+    text = text.replace(' \n','').replace('\r','')
+
+    file = open(pngfile.replace('Test.pptx','')+'write.txt','w+',encoding='utf-8')
+    file.write(text)
+    file.close()
+    print('Close')
+
+def main():
+    pngfile = input('请输入图片保存位置')
+    trans(pngfile)
+
+main()
